@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# coding: utf-8
+
 from keras.datasets import mnist
 dataset = mnist.load_data('mymnist.db')
 train , test = dataset
@@ -25,11 +28,11 @@ model.add(Dense(units=32, activation='relu'))
 model.add(Dense(units=10, activation='softmax'))
 from keras.optimizers import RMSprop
 model.compile(optimizer=RMSprop(), loss='categorical_crossentropy', 
-             metrics=['accuracy']
+             metrics=['acc']
              )
-h = model.fit(X_train, y_train_cat, epochs=20)
+h = model.fit(X_train, y_train_cat, epochs=3)
 model.predict(X_test)
-p=h.history['accuracy']
+p=h.history['acc']
 with open('file.txt','w') as f:
-    f.write(str(p[7]))
-model.save('mnist.py')
+    f.write(str(p[2]))
+model.save('accuracy')
