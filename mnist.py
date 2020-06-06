@@ -1,38 +1,93 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from keras.datasets import mnist
-dataset = mnist.load_data('mymnist.db')
-train , test = dataset
-X_train , y_train = train
-X_test , y_test = test
-img1 = X_train[7]
-import cv2
-img1_label = y_train[7]
-X_train_1d = X_train.reshape(-1 , 28*28)
-X_test_1d = X_test.reshape(-1 , 28*28)
-X_train = X_train_1d.astype('float32')
-X_test = X_test_1d.astype('float32')
-X_train.shape
-from keras.utils.np_utils import to_categorical
-y_train_cat = to_categorical(y_train)
+from keras.preprocessing.image import ImageDataGenerator
 from keras.models import Sequential
-from keras.layers import Dense
+from keras.layers import Dense, Dropout, Activation, Flatten
+from keras.layers import Conv2D, MaxPooling2D, ZeroPadding2D
+from keras.layers.normalization import BatchNormalization
+from keras.regularizers import l2
+from keras.datasets import mnist
+from keras.utils import np_utils
+import keras
+
+# loads the MNIST dataset
+(x_train, y_train), (x_test, y_test)  = mnist.load_data()
+
+# Lets store the number of rows and columns
+img_rows = x_train[0].shape[0]
+img_cols = x_train[1].shape[0]
+
+# Getting our date in the right 'shape' needed for Keras
+# We need to add a 4th dimenion to our date thereby changing our
+# Our original image shape of (60000,28,28) to (60000,28,28,1)
+x_train = x_train.reshape(x_train.shape[0], img_rows, img_cols, 1)
+x_test = x_test.reshape(x_test.shape[0], img_rows, img_cols, 1)
+
+# store the shape of a single image 
+input_shape = (img_rows, img_cols, 1)
+
+# change our image type to float32 data type
+x_train = x_train.astype('float32')
+x_test = x_test.astype('float32')
+
+# Normalize our data by changing the range from (0 to 255) to (0 to 1)
+x_train /= 255
+x_test /= 255
+
+# Now we one hot encode outputs
+y_train = np_utils.to_categorical(y_train)
+y_test = np_utils.to_categorical(y_test)
+
+num_classes = y_test.shape[1]
+num_pixels = x_train.shape[1] * x_train.shape[2]
+
+
+
+# create model
 model = Sequential()
-model.add(Dense(units=512, input_dim=28*28, activation='relu'))
-model.add(Dense(units=256, activation='relu'))
-i=0
-for i in range(i):
-    model.add(Dense(units=128, activation='relu'))
-model.add(Dense(units=32, activation='relu'))
+
+# 1 set of CRP (Convolution, RELU, Pooling)
+model.add(Conv2D(5, (3, 3),
+                  
+                 input_shape = input_shape))
+model.add(Activation("relu"))
+model.add(MaxPooling2D(pool_size = (5,5), strides = (3, 3)))
+
+
+# Fully connected layers (w/ RELU)
+model.add(Flatten())
+model.add(Dense(units=5, input_dim=28*28, activation='relu'))
+
+
+# Softmax (for classification)
 model.add(Dense(units=10, activation='softmax'))
+
 from keras.optimizers import RMSprop
+           
 model.compile(optimizer=RMSprop(), loss='categorical_crossentropy', 
-             metrics=['acc']
+             metrics=['accuracy']
              )
-h = model.fit(X_train, y_train_cat, epochs=3)
-model.predict(X_test)
-p=h.history['acc']
-with open('file.txt','w') as f:
-    f.write(str(p[2]))
-model.save('accuracy')
+    
+print(model.summary())
+
+
+# Training Parameters
+batch_size = 128
+epochs = 3
+
+history = model.fit(x_train, y_train,
+          batch_size=batch_size,
+          epochs=epochs,
+          validation_data=(x_test, y_test),
+          shuffle=True)
+
+model.save("mnist_LeNet.h5")
+
+# Evaluate the performance of our trained model
+scores = model.evaluate(x_test, y_test, verbose=1)
+accuracy_score=scores[1]
+f=open("output.txt","w")
+f.write(str(100*accuracy_score))
+print('Test loss:', scores[0])
+print('Test accuracy:', scores[1])
