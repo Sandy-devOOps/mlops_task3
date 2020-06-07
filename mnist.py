@@ -82,6 +82,7 @@ history = model.fit(x_train, y_train,
           validation_data=(x_test, y_test),
           shuffle=True)
 
+save_weight_only=True
 model.save("mnist_LeNet.h5")
 
 # Evaluate the performance of our trained model
