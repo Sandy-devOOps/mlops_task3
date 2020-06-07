@@ -92,3 +92,14 @@ f.write(str(100*accuracy_score))
 print('Test loss:', scores[0])
 print('Test accuracy:', scores[1])
 
+accuracy_file = open('/root/mlops/accuracy.txt','w')
+accuracy_file.write(str(scores[1]))
+accuracy_file.close()
+
+display_matter = open('/root/mlops/display_matter.html','r+')
+display_matter.read()
+display_matter.write('<pre>\n---------------------------------------------\n')
+display_matter.write('\nAccuracy achieved : ' + str(scores[1])+'\n</pre>')
+display_matter.close()
+
+
