@@ -48,7 +48,7 @@ num_pixels = x_train.shape[1] * x_train.shape[2]
 model = Sequential()
 
 # 1 set of CRP (Convolution, RELU, Pooling)
-model.add(Conv2D(5, (3, 3),
+model.add(Conv2D(filters=5,kernal_size=(3, 3),
                   
                  input_shape = input_shape))
 model.add(Activation("relu"))
