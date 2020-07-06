@@ -48,20 +48,11 @@ history = model.fit(X_train, y_train,
           validation_data=(X_test, y_test),
           shuffle=True)
 model.predict(X_test)
-scores = model.evaluate(X_test, y_test, verbose=1)
+
+scores = model.evaluate(x_test, y_test, verbose=1)
 accuracy_score=scores[1]
-f=open("/root/mlops/output.txt","w")
+f=open("output.txt","w")
 f.write(str(100*accuracy_score))
 print('Test loss:', scores[0])
 print('Test accuracy:', scores[1])
-
-accuracy_file = open('/root/mlops/accuracy.txt','w')
-accuracy_file.write(str(scores[1]))
-accuracy_file.close()
-
-display_matter = open('/root/mlops/display_matter.html','r+')
-display_matter.read()
-display_matter.write('<pre>\n---------------------------------------------\n')
-display_matter.write('\nAccuracy achieved : ' + str(scores[1])+'\n</pre>')
-display_matter.close()
 
